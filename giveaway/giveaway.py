@@ -260,9 +260,9 @@ class GiveawayPlugin(commands.Cog):
 
         await ctx.send(
             embed=self.generate_embed(
-                "How long will the giveaway last?\n\n2d / 2days / 2day -> 2 days\n"
+                "**How long will the giveaway last?\n\n2d / 2days / 2day -> 2 days\n"
                 "2m -> 2 minutes\n2 months -> 2 months"
-                "\ntomorrow / in 10 minutes / 2h 10minutes work too\n"
+                "\ntomorrow / in 10 minutes / 2h 10minutes work too\n**"
             )
         )
         time_cancel = False
@@ -289,7 +289,7 @@ class GiveawayPlugin(commands.Cog):
                 json = await resp.json()
                 giveaway_time = json["message"]
                 break
-        await ctx.send(embed=self.generate_embed("**Any requires roles? Enter \"NO\" if no!"))
+        await ctx.send(embed=self.generate_embed("**Any required roles? Enter \"NO\" if no!**"))
         while True:
             giveaway_role = await self.bot.wait_for("message", check=check)
 
