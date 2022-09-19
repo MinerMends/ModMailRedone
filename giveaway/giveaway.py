@@ -14,7 +14,7 @@ from core.models import PermissionLevel
 
 class GiveawayPlugin(commands.Cog):
     """
-    Host giveaways on your server with this ~~amazing~~ plugin
+    #MendingArmy Modified Giveaway Plugin
     """
 
     def __init__(self, bot):
@@ -87,7 +87,7 @@ class GiveawayPlugin(commands.Cog):
                 if len(message.reactions) <= 0:
                     embed = message.embeds[0]
                     embed.description = (
-                        f"Giveaway has ended!\n\nSadly no one participated :("
+                        f"**#MendingArmy | No One Participated**"
                     )
                     embed.set_footer(
                         text=f"{giveaway['winners']} {'winners' if giveaway['winners'] > 1 else 'winner'} | Ended at"
@@ -110,7 +110,7 @@ class GiveawayPlugin(commands.Cog):
                         if len(reacted_users) <= 1:
                             embed = message.embeds[0]
                             embed.description = (
-                                f"Giveaway has ended!\n\nSadly no one participated :("
+                                f"**#MendingArmy | No One Participated**"
                             )
                             embed.set_footer(
                                 text=f"{giveaway['winners']} {'winners' if giveaway['winners'] > 1 else 'winner'} | "
@@ -142,15 +142,14 @@ class GiveawayPlugin(commands.Cog):
                         for winner in winners:
                             winners_text += f"<@{winner}> "
 
-                        embed.description = f"Giveaway has ended!\n\n**{'Winners' if giveaway['winners'] > 1 else 'Winner'}:** {winners_text} "
+                        embed.description = f"**#MendingArmy** | Giveaway Ended\n\n**{'Winners' if giveaway['winners'] > 1 else 'Winner'}:** {winners_text} "
                         embed.set_footer(
                             text=f"{giveaway['winners']} {'winners' if giveaway['winners'] > 1 else 'winner'} | "
                             f"Ended at"
                         )
                         await message.edit(embed=embed)
                         await channel.send(
-                            f"🎉 Congratulations {winners_text}, you have won **{giveaway['item']}**!"
-                        )
+                            f"{winners_text}",delete_after=0.1)
                         try:
                             giveaway['ended'] = True
                             self.active_giveaways[str(giveaway["message"])] = giveaway
@@ -166,7 +165,7 @@ class GiveawayPlugin(commands.Cog):
             else:
 
                 time_remaining = f"{math.floor(g_time // 86400)} Days, {math.floor(g_time // 3600 % 24)} Hours, {math.floor(g_time // 60 % 60)} Minutes, {math.floor(g_time % 60)} Seconds "
-                description =  f"React with 🎉 to enter the giveaway!\nTime Remaining: **{time_remaining}**"
+                description =  f"**#MendingArmy** | React to enter\nEnding: **{time_remaining}**"
 
                 if giveaway['role'] is not None:
                     description = description + f"\nMust have role: <@&{giveaway['role']}>"
@@ -194,7 +193,7 @@ class GiveawayPlugin(commands.Cog):
             if role is not None and member not in role.members:
                 try:
                     await reaction.remove(user=user)
-                    await user.send(f"You do not have role **{role.name}**. So you can't participate in the giveaway. ")
+                    await user.send(f"> You must have the **{role.name}** role to enter!")
                 except:
                     pass
 
@@ -229,20 +228,20 @@ class GiveawayPlugin(commands.Cog):
         def cancel_check(msg: discord.Message):
             return msg.content == "cancel" or msg.content == f"{ctx.prefix}cancel"
 
-        embed = discord.Embed(colour=0x00FF00)
+        embed = discord.Embed(colour=0x2f3136)
 
-        await ctx.send(embed=self.generate_embed("What is the giveaway item?"))
+        await ctx.send(embed=self.generate_embed("**What is the Giveaway item?**"))
         giveaway_item = await self.bot.wait_for("message", check=check)
         if cancel_check(giveaway_item) is True:
-            await ctx.send("Cancelled.")
+            await ctx.send("**Aborted!**")
             return
         embed.title = giveaway_item.content
         await ctx.send(
-            embed=self.generate_embed("How many winners are to be selected?")
+            embed=self.generate_embed("**How many winners?**")
         )
         giveaway_winners = await self.bot.wait_for("message", check=check)
         if cancel_check(giveaway_winners) is True:
-            await ctx.send("Cancelled.")
+            await ctx.send("**Aborted!**")
             return
         try:
             giveaway_winners = int(giveaway_winners.content)
@@ -290,7 +289,7 @@ class GiveawayPlugin(commands.Cog):
                 json = await resp.json()
                 giveaway_time = json["message"]
                 break
-        await ctx.send(embed=self.generate_embed("Roles member must have to participate in the giveaway.\n\nIf no requirements then type `No`"))
+        await ctx.send(embed=self.generate_embed("**Any requires roles? Enter \"NO\" if no!"))
         while True:
             giveaway_role = await self.bot.wait_for("message", check=check)
 
@@ -300,7 +299,7 @@ class GiveawayPlugin(commands.Cog):
 
             if cancel_check(giveaway_role) is True:
                 time_cancel = True
-                await ctx.send("Cancelled.")
+                await ctx.send("**Aborted!**")
                 break
 
             try:
@@ -312,10 +311,10 @@ class GiveawayPlugin(commands.Cog):
         if time_cancel is True:
             return
         
-        description = f"React with 🎉 to enter the giveaway!\n\n"
-        description = description+ f"Time Remaining: **{datetime.fromtimestamp(giveaway_time).strftime('%d %H:%M:%S')}**"
+        description = f"**#MendingArmy** | React to enter\n"
+        description = description+ f"Ending: **{datetime.fromtimestamp(giveaway_time).strftime('%d %H:%M:%S')}**"
         if giveaway_role is not None:
-            description = description + f"\nMust have role: <@&{giveaway_role.id}>"
+            description = description + f"\n**Role Required**: <@&{giveaway_role.id}>"
 
         embed.description = (description)
         embed.set_footer(
@@ -339,7 +338,8 @@ class GiveawayPlugin(commands.Cog):
             giveaway_obj['role'] = None
         
         self.active_giveaways[str(msg.id)] = giveaway_obj
-        await ctx.send(f"Done! Giveaway started [here](<{msg.jump_url}>)")
+        embed = discord.Embed(description=f"**Giveaway Started**: [Click Me](<{msg.jump_url}>)",color=0x2f3136)
+        await ctx.send(embed=embed)
         await self._update_db()
         await self._start_new_giveaway_thread(giveaway_obj)
 
@@ -390,6 +390,7 @@ class GiveawayPlugin(commands.Cog):
                 text=f"{winners_count} {'winners' if winners_count > 1 else 'winner'} | Ended at"
             )
             await message.edit(embed=embed)
+            await channel.send(f"{winners_text}",delete_after=0.1)
             return
 
         for r in message.reactions:
@@ -422,13 +423,13 @@ class GiveawayPlugin(commands.Cog):
                 for winner in winners:
                     winners_text += f"<@{winner}> "
 
-                embed.description = f"Giveaway has ended!\n\n**{'Winners' if winners_count > 1 else 'Winner'}:** {winners_text}"
+                embed.description = f"**#MendingArmy** | Giveaway Ended\n\n**{'Winners' if winners_count > 1 else 'Winner'}:** {winners_text}"
                 embed.set_footer(
                     text=f"{winners_count} {'winners' if winners_count > 1 else 'winner'} | Ended at"
                 )
                 await message.edit(embed=embed)
                 await ctx.channel.send(
-                    f"🎉 Congratulations {winners_text}, you have won **{embed.title}**!"
+                    f"{winners_text}"
                 )
                 del winners_text, winners, winners_count, reacted_users, embed
                 break
@@ -469,7 +470,7 @@ class GiveawayPlugin(commands.Cog):
         await message.edit(embed=embed)
         self.active_giveaways.pop(_id)
         await self._update_db()
-        await ctx.send("Cancelled!")
+        await ctx.send("**Aborted!**")
         return
 
     async def _start_new_giveaway_thread(self, obj):
